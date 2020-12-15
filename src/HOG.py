@@ -10,8 +10,8 @@ from skimage import color
 
 from six.moves import cPickle
 import numpy as np
-import scipy.misc
 import os
+import imageio
 
 n_bin    = 10
 n_slice  = 6
@@ -89,7 +89,7 @@ class HOG(object):
     if isinstance(input, np.ndarray):  # examinate input type
       img = input.copy()
     else:
-      img = scipy.misc.imread(input, mode='RGB')
+      img = imageio.imread(input, pilmode='RGB')
     height, width, channel = img.shape
   
     if type == 'global':
@@ -128,7 +128,7 @@ class HOG(object):
       sample_cache = "HOG-{}-n_bin{}-n_slice{}-n_orient{}-ppc{}-cpb{}".format(h_type, n_bin, n_slice, n_orient, p_p_c, c_p_b)
   
     try:
-      samples = cPickle.load(open(os.path.join(cache_dir, sample_cache), "rb", True))
+      samples = cPickle.load(open(os.path.join(cache_dir, sample_cache), "rb"))
       for sample in samples:
         sample['hist'] /= np.sum(sample['hist'])  # normalize
       if verbose:

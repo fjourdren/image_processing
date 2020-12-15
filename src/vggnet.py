@@ -9,8 +9,8 @@ from torchvision.models.vgg import VGG
 
 from six.moves import cPickle
 import numpy as np
-import scipy.misc
 import os
+import imageio
 
 from evaluate import evaluate_class
 from DB import Database
@@ -165,7 +165,7 @@ class VGGNetFeat(object):
       data = db.get_data()
       for d in data.itertuples():
         d_img, d_cls = getattr(d, "img"), getattr(d, "cls")
-        img = scipy.misc.imread(d_img, mode="RGB")
+        img = imageio.imread(input, pilmode='RGB')
         img = img[:, :, ::-1]  # switch to BGR
         img = np.transpose(img, (2, 0, 1)) / 255.
         img[0] -= means[0]  # reduce B's mean

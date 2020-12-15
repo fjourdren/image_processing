@@ -2,18 +2,22 @@
 
 from __future__ import print_function
 
-from evaluate import evaluate_class
+from evaluate import evaluate_class, evaluate
 from DB import Database
 
-from skimage.feature import daisy
+from skimage.feature import daisy as skidaisy
 from skimage import color
 
 from six.moves import cPickle
 import numpy as np
-import scipy.misc
+import imageio
 import math
 
 import os
+from os.path import exists
+from shutil import rmtree
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 
 
 n_slice    = 2
@@ -22,7 +26,7 @@ step       = 10
 radius     = 30
 rings      = 2
 histograms = 6
-h_type     = 'region'
+h_type     = 'global' #'region'
 d_type     = 'd1'
 
 depth      = 3
@@ -79,7 +83,7 @@ class Daisy(object):
     if isinstance(input, np.ndarray):  # examinate input type
       img = input.copy()
     else:
-      img = scipy.misc.imread(input, mode='RGB')
+      img = imageio.imread(input) # (input)
     height, width, channel = img.shape
   
     P = math.ceil((height - radius*2) / step) 
@@ -107,7 +111,7 @@ class Daisy(object):
   
   def _daisy(self, img, normalize=True):
     image = color.rgb2gray(img)
-    descs = daisy(image, step=step, radius=radius, rings=rings, histograms=histograms, orientations=n_orient)
+    descs = skidaisy(image, step=step, radius=radius, rings=rings, histograms=histograms, orientations=n_orient)
     descs = descs.reshape(-1, R)  # shape=(N, R)
     hist  = np.mean(descs, axis=0)  # shape=(R,)
   
@@ -124,7 +128,7 @@ class Daisy(object):
       sample_cache = "daisy-{}-n_slice{}-n_orient{}-step{}-radius{}-rings{}-histograms{}".format(h_type, n_slice, n_orient, step, radius, rings, histograms)
   
     try:
-      samples = cPickle.load(open(os.path.join(cache_dir, sample_cache), "rb", True))
+      samples = cPickle.load(open(os.path.join(cache_dir, sample_cache), "rb"))
       for sample in samples:
         sample['hist'] /= np.sum(sample['hist'])  # normalize
       if verbose:
