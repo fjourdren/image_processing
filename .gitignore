@@ -1,7 +1,7 @@
 .vscode
 cache
 database
-result
+result/MMAP_result
 __pycache__
 data.csv
 nogit_*
