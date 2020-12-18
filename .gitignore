@@ -3,5 +3,5 @@ cache
 database
 result/MMAP_result
 __pycache__
-data.csv
+data*.csv
 nogit_*

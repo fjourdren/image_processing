@@ -3,6 +3,7 @@ import os
 import numpy as np
 import shutil
 import random
+from DB import DatabaseType
 
 # data root path
 dir_dataset = 'database'
@@ -19,9 +20,9 @@ for cls in os.listdir(dir_dataset):
 
 
 # delete old train, validation & test if it exists
-dir_train = os.path.join(dir_dataset, 'train')
-dir_validation = os.path.join(dir_dataset, 'validation')
-dir_test = os.path.join(dir_dataset, 'test')
+dir_train      = os.path.join(dir_dataset, DatabaseType.TRAIN.value)
+dir_validation = os.path.join(dir_dataset, DatabaseType.VALIDATION.value)
+dir_test       = os.path.join(dir_dataset, DatabaseType.TEST.value)
 
 
 # if dataset has already been split, we stop the process
