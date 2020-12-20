@@ -1,7 +1,9 @@
 .vscode
 cache
 database
+model
 result/MMAP_result
 __pycache__
 data*.csv
 nogit_*
+src/deeplearning

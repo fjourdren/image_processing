@@ -10,8 +10,8 @@ from daisy import Daisy
 from edge  import Edge
 from gabor import Gabor
 from HOG   import HOG
-from vggnet import VGGNetFeat
-from resnet import ResNetFeat
+#from vggnet import VGGNetFeat
+#from resnet import ResNetFeat
 
 import numpy as np
 import itertools
@@ -21,7 +21,7 @@ import os
 d_type   = 'd1'
 depth    = 30
 
-feat_pools = ['color', 'daisy', 'edge', 'gabor', 'hog', 'vgg', 'res']
+feat_pools = ['color', 'daisy'] # 'edge', 'gabor', 'hog', 'vgg', 'res'
 
 # result dir
 result_dir = 'result'
@@ -59,10 +59,10 @@ class FeatureFusion(object):
       f_c = Gabor()
     elif f_class == 'hog':
       f_c = HOG()
-    elif f_class == 'vgg':
+    '''elif f_class == 'vgg':
       f_c = VGGNetFeat()
     elif f_class == 'res':
-      f_c = ResNetFeat()
+      f_c = ResNetFeat()'''
     return f_c.make_samples(db, verbose=False)
 
   def _concat_feat(self, db, feats):
