@@ -32,7 +32,7 @@ class Database(object):
     with open(self.csv, 'w', encoding='UTF-8') as f:
       f.write("img,cls")
       for root, _, files in os.walk(self.dir, topdown=False):
-        cls = root.split('/')[-1]
+        cls = root.split(os.sep)[-1]
         for name in files:
           if not name.endswith('.jpg'):
             continue

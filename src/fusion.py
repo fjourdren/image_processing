@@ -21,7 +21,7 @@ import os
 d_type   = 'd1'
 depth    = 30
 
-feat_pools = ['color', 'daisy'] # 'edge', 'gabor', 'hog', 'vgg', 'res'
+feat_pools = ['color', 'daisy', 'edge', 'gabor', 'hog'] # 'vgg', 'res'
 
 # result dir
 result_dir = 'result'
