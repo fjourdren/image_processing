@@ -70,6 +70,23 @@ def evaluate_dataset(samples_train, samples_validation):
     return ap, classes_aps # return average precision and precision for each class
 
 
+def evaluate_image(samples_train, query):
+    # infer the image and return the $depth closest neighbors
+    _, results = infer(query, samples=samples_train, depth=depth, d_type=d_type) # results is an array with images distance and class (we don't use AP from the infer method because it doesn't use the weigthed KNN algorithm to predict class, it only predict that neighbors are the good ones)
+
+    # weighted class (knn algorithm on the $depth closest neighbors)
+    pred = weighted_mode(
+        [sub["cls"] for sub in results],
+        np.reciprocal([sub["dis"] for sub in results]),
+    )
+
+    # exctract predicted class
+    predicted_class = pred[0][0]
+
+    # return image's predicted class
+    return predicted_class
+
+
 if __name__ == "__main__":
     # pick datasets
     print("=== Preparing datasets ===")
@@ -77,6 +94,8 @@ if __name__ == "__main__":
     db_train = Database(DatabaseType.TRAIN)
     db_validation = Database(DatabaseType.VALIDATION)
     db_test = Database(DatabaseType.TEST)
+
+
 
     # train
     print("=== Training ===")
@@ -87,19 +106,19 @@ if __name__ == "__main__":
     train_time = round((time.time() - start_time) / 60, 3) # get train time in minute
     print("Trained in %smins." % (train_time))
 
-    # perform model on one image
-    '''print("=== Perform one image ===")
-    filename = "database\\test\\woman\\388027.jpg"
-    cls = "woman"
-    print("Performing image: %s (%s)" % filename, cls)
-    samples_image = fusion.make_samples_image(filename)
-    query = {
-        'img':  filename,
-        'cls':  cls,
-        'hist': sample_query
-    }
-    results = evaluate_image(samples_train, query)
-    print("Class found: %s" % results)'''
+
+
+    # predict one image
+    print("=== Predict one image ===")
+    filename = "database\\test\\obj_car\\29031.jpg"
+    expected_cls = "obj_car"
+    print("Performing image: %s" % filename)
+    print("Expected class: %s" % expected_cls)
+    query = fusion.make_samples_image(filename)[0]
+    predicted_class = evaluate_image(samples_train, query)
+    print("Predicted class: %s" % predicted_class)
+
+
 
     # evaluate model on dataset
     print("=== Model evaluation ===")
@@ -113,11 +132,3 @@ if __name__ == "__main__":
         print("    - %s: %f" % (cls, precision_classes[cls]))
     
     print("\n* Classification average precision (AP): %f" % ap) # sample_analysis
-
-
-
-
-
-'''
-sample_query = Color.histogram("database\\validation\\woman\\420067.jpg", n_bin=n_bin, type=h_type, n_slice=n_slice, normalize=True)
-'''

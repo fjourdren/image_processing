@@ -119,6 +119,18 @@ class Daisy(object):
       hist = np.array(hist) / np.sum(hist)
   
     return hist
+
+  
+  def make_samples_img(self, img_path, verbose=True):
+    samples = []
+    d_hist = self.histogram(img_path, type=h_type, n_slice=n_slice)
+    samples.append({
+                    'img':  img_path, 
+                    'cls':  img_path, 
+                    'hist': d_hist
+                  })
+
+    return samples
   
   
   def make_samples(self, db, verbose=True):
