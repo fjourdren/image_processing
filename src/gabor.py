@@ -3,7 +3,7 @@
 from __future__ import print_function
 
 from evaluate import *
-from DB import Database
+from DB import Database, DatabaseType
 
 from skimage.filters import gabor_kernel
 from skimage import color
@@ -183,8 +183,24 @@ class Gabor(object):
       print("return zero")
       ret = np.zeros(2)
     return ret
-  
-  
+
+
+  def make_samples_img(self, img_path, verbose=True):
+    if verbose:
+      print("Counting histogram..., distance=%s, depth=%s" % (d_type, depth))
+
+    samples = []
+
+    d_hist = self.gabor_histogram(img_path, type=h_type, n_slice=n_slice)
+    samples.append({
+                    'img':  img_path, 
+                    'cls':  img_path, 
+                    'hist': d_hist
+                  })
+
+    return samples
+
+
   def make_samples(self, db, verbose=True):
     if h_type == 'global':
       sample_cache = "gabor-{}-theta{}-frequency{}-sigma{}-bandwidth{}".format(h_type, theta, frequency, sigma, bandwidth)
@@ -217,7 +233,7 @@ class Gabor(object):
 
 
 if __name__ == "__main__":
-  db = Database()
+  db = Database(DatabaseType.TRAIN)
 
   # evaluate database
   APs = evaluate_class(db, f_class=Gabor, d_type=d_type, depth=depth)

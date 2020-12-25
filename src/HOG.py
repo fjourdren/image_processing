@@ -3,7 +3,7 @@
 from __future__ import print_function
 
 from evaluate import evaluate_class
-from DB import Database
+from DB import Database, DatabaseType
 
 from skimage.feature import hog
 from skimage import color
@@ -121,6 +121,23 @@ class HOG(object):
   
     return hist
 
+  
+  def make_samples_img(self, img_path, verbose=True):
+    if verbose:
+      print("Counting histogram..., distance=%s, depth=%s" % (d_type, depth))
+
+    samples = []
+
+    d_hist = self.histogram(img_path, type=h_type, n_slice=n_slice)
+    samples.append({
+                    'img':  img_path, 
+                    'cls':  img_path, 
+                    'hist': d_hist
+                  })
+
+    return samples
+
+
   def make_samples(self, db, verbose=True):
     if h_type == 'global':
       sample_cache = "HOG-{}-n_bin{}-n_orient{}-ppc{}-cpb{}".format(h_type, n_bin, n_orient, p_p_c, c_p_b)
@@ -153,7 +170,7 @@ class HOG(object):
 
 
 if __name__ == "__main__":
-  db = Database()
+  db = Database(DatabaseType.TRAIN)
 
   # evaluate database
   APs = evaluate_class(db, f_class=HOG, d_type=d_type, depth=depth)

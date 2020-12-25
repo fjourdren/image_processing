@@ -3,7 +3,7 @@
 from __future__ import print_function
 
 from evaluate import distance, evaluate_class
-from DB import Database
+from DB import Database, DatabaseType
 
 from six.moves import cPickle
 import numpy as np
@@ -171,7 +171,7 @@ class Color(object):
 
 
 if __name__ == "__main__":
-  db = Database()
+  db = Database(DatabaseType.TRAIN)
   data = db.get_data()
   color = Color()
 

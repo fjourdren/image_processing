@@ -10,8 +10,8 @@ from daisy import Daisy
 from edge  import Edge
 from gabor import Gabor
 from HOG   import HOG
-#from vggnet import VGGNetFeat
-#from resnet import ResNetFeat
+from vggnet import VGGNetFeat
+from resnet import ResNetFeat
 
 import numpy as np
 import itertools
@@ -69,10 +69,10 @@ class FeatureFusion(object):
       f_c = Gabor()
     elif f_class == 'hog':
       f_c = HOG()
-    '''elif f_class == 'vgg':
+    elif f_class == 'vgg':
       f_c = VGGNetFeat()
     elif f_class == 'res':
-      f_c = ResNetFeat()'''
+      f_c = ResNetFeat()
     return f_c.make_samples_img(input_path, verbose=False)
 
   def _get_feat(self, db, f_class):
@@ -86,10 +86,10 @@ class FeatureFusion(object):
       f_c = Gabor()
     elif f_class == 'hog':
       f_c = HOG()
-    '''elif f_class == 'vgg':
+    elif f_class == 'vgg':
       f_c = VGGNetFeat()
     elif f_class == 'res':
-      f_c = ResNetFeat()'''
+      f_c = ResNetFeat()
     return f_c.make_samples(db, verbose=False)
 
   def _concat_feat(self, feats):

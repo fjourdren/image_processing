@@ -15,7 +15,7 @@ import os
 import imageio
 
 from evaluate import evaluate_class
-from DB import Database
+from DB import Database, DatabaseType
 
 
 '''
@@ -140,7 +140,7 @@ class ResNetFeat(object):
       data = db.get_data()
       for d in data.itertuples():
         d_img, d_cls = getattr(d, "img"), getattr(d, "cls")
-        img = imageio.imread(input, pilmode='RGB')
+        img = imageio.imread(d_img, pilmode='RGB')
         img = img[:, :, ::-1]  # switch to BGR
         img = np.transpose(img, (2, 0, 1)) / 255.
         img[0] -= means[0]  # reduce B's mean
@@ -169,7 +169,7 @@ class ResNetFeat(object):
 
 if __name__ == "__main__":
   # evaluate database
-  db = Database()
+  db = Database(DatabaseType.TRAIN)
   APs = evaluate_class(db, f_class=ResNetFeat, d_type=d_type, depth=depth)
   cls_MAPs = []
   for cls, cls_APs in APs.items():

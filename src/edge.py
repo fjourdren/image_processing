@@ -3,7 +3,7 @@
 from __future__ import print_function
 
 from evaluate import evaluate_class
-from DB import Database
+from DB import Database, DatabaseType
 
 from six.moves import cPickle
 import numpy as np
@@ -153,6 +153,21 @@ class Edge(object):
       hist /= np.sum(hist)
   
     return hist
+
+  
+  def make_samples_img(self, img_path, verbose=True):
+    if verbose:
+      print("Counting histogram..., distance=%s, depth=%s" % (d_type, depth))
+
+    samples = []
+    d_hist = self.histogram(img_path, type=h_type, n_slice=n_slice)
+    samples.append({
+                    'img':  img_path, 
+                    'cls':  img_path, 
+                    'hist': d_hist
+                  })
+
+    return samples
   
   
   def make_samples(self, db, verbose=True):
@@ -187,7 +202,7 @@ class Edge(object):
 
 
 if __name__ == "__main__":
-  db = Database()
+  db = Database(DatabaseType.TRAIN)
 
   # check shape
   assert edge_kernels.shape == (5, 2, 2)
