@@ -62,6 +62,7 @@ rsa @ file:///tmp/build/80754af9/rsa_1596998415516/work
 scikit-image==0.17.2
 scikit-learn @ file:///C:/ci/scikit-learn_1598377018496/work
 scipy @ file:///C:/ci/scipy_1604596260408/work
+seaborn @ file:///tmp/build/80754af9/seaborn_1608578541026/work
 sip==4.19.13
 six @ file:///C:/ci/six_1605187374963/work
 tensorboard @ file:///home/builder/ktietz/conda/conda-bld/tensorboard_1604313476433/work/tmp_pip_dir

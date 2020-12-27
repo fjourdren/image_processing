@@ -46,17 +46,22 @@ class FeatureFusion(object):
     samples = self._concat_feat(feats)
     return samples
 
-  def make_samples(self, db, verbose=False):
+  def make_samples(self, db, verbose=False, cache=True):
     if verbose:
       print("Use features {}".format(" & ".join(self.features)))
 
-    if self.samples == None:
+    if self.samples == None or cache == False:
       feats = []
       for f_class in self.features:
-        feats.append(self._get_feat(db, f_class))
+        feats.append(self._get_feat(db, f_class, cache))
       samples = self._concat_feat(feats)
-      self.samples = samples  # cache the result
-    return self.samples
+      if cache:
+        self.samples = samples  # cache the result
+    
+    if cache:
+      return self.samples
+    else:
+      return samples
 
   def _get_feat_img(self, input_path, f_class):
     if f_class == 'color':
@@ -75,7 +80,7 @@ class FeatureFusion(object):
       f_c = ResNetFeat()
     return f_c.make_samples_img(input_path, verbose=False)
 
-  def _get_feat(self, db, f_class):
+  def _get_feat(self, db, f_class, cache=True):
     if f_class == 'color':
       f_c = Color()
     elif f_class == 'daisy':
@@ -90,7 +95,7 @@ class FeatureFusion(object):
       f_c = VGGNetFeat()
     elif f_class == 'res':
       f_c = ResNetFeat()
-    return f_c.make_samples(db, verbose=False)
+    return f_c.make_samples(db, verbose=False, cache=cache)
 
   def _concat_feat(self, feats):
     samples = feats[0]

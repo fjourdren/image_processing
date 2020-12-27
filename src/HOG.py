@@ -138,13 +138,15 @@ class HOG(object):
     return samples
 
 
-  def make_samples(self, db, verbose=True):
+  def make_samples(self, db, verbose=True, cache=True):
     if h_type == 'global':
       sample_cache = "HOG-{}-n_bin{}-n_orient{}-ppc{}-cpb{}".format(h_type, n_bin, n_orient, p_p_c, c_p_b)
     elif h_type == 'region':
       sample_cache = "HOG-{}-n_bin{}-n_slice{}-n_orient{}-ppc{}-cpb{}".format(h_type, n_bin, n_slice, n_orient, p_p_c, c_p_b)
   
     try:
+      if cache == False:
+        raise ValueError('Don\'t use cache') 
       samples = cPickle.load(open(os.path.join(cache_dir, sample_cache), "rb", True))
       for sample in samples:
         sample['hist'] /= np.sum(sample['hist'])  # normalize
@@ -164,7 +166,9 @@ class HOG(object):
                         'cls':  d_cls, 
                         'hist': d_hist
                       })
-      cPickle.dump(samples, open(os.path.join(cache_dir, sample_cache), "wb", True))
+
+      if cache:
+        cPickle.dump(samples, open(os.path.join(cache_dir, sample_cache), "wb", True))
 
     return samples
 

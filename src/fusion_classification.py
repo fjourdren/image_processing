@@ -1,7 +1,10 @@
 import numpy as np
 import time
-from collections import defaultdict
+import matplotlib.pyplot as plt
+import seaborn as sn
+import pandas as pd
 from sklearn.utils.extmath import weighted_mode
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, classification_report
 
 from fusion import FeatureFusion
 
@@ -23,10 +26,10 @@ d_type = 'd1' # d1 is the method to calculate distances
 depth  = 5 # 5 closest neighbors
 
 
-def evaluate_dataset(samples_train, samples_validation):
-    # array to calculate classes' AP
-    tmp_class_aps = defaultdict(lambda: 0)
-    tmp_class_img_nb = defaultdict(lambda: 0)
+def evaluate_dataset(samples_train, samples_validation, classes):
+    # confusion matrix init
+    y_true = []
+    y_pred = []
 
     for query in samples_validation:
         # infer the image and return the $depth closest neighbors
@@ -38,36 +41,28 @@ def evaluate_dataset(samples_train, samples_validation):
             np.reciprocal([sub["dis"] for sub in results]),
         )
 
-        # make result query for that pic to calculate AP (average precision)
-        validation_query = [{
-            'cls': pred[0][0],
-            'dis': pred[1][0]
-        }]
-
-        # evaluate if the class is the good one or not
-        image_ap = float(AP(query["cls"], validation_query, sort=False)) # calculate precision on the image (here 0 if it's not the good class, otherwise 1) => we calculate a new precision only on the class result from the KNN algorithm
-
-        # add to array to be able to make a confusion matrix
-        tmp_class_img_nb[query["cls"]] += 1 # increments the number of image waited in the class
-        tmp_class_aps[query["cls"]] += image_ap # add the image precision result
+        # add elements to calculate metrics later
+        y_true.append(query["cls"])
+        y_pred.append(pred[0][0])
 
 
-    # calculate for each class the average precision
-    classes_aps = {}
 
-    total_aps = 0
-    total_img = 0
-    for cls in tmp_class_aps.keys():
-        classes_aps[cls] = tmp_class_aps[cls] / tmp_class_img_nb[cls]
-        
-        # add elements in acumulators make average precision later
-        total_aps += tmp_class_aps[cls]
-        total_img += tmp_class_img_nb[cls]
+    # calculate accuracy
+    accuracy = accuracy_score(y_true, y_pred)
 
-    # calculate average precision on all classes
-    ap = total_aps / total_img
+    # calculate recall
+    recall = recall_score(y_true, y_pred, average=None)
 
-    return ap, classes_aps # return average precision and precision for each class
+    # calculate precision
+    precision = precision_score(y_true, y_pred, average=None)
+
+    # calculate confusion matrix
+    conf_matrix = confusion_matrix(y_true, y_pred, labels=list(classes))
+
+    # make report
+    report = classification_report(y_true, y_pred, target_names=list(classes))
+
+    return accuracy, recall, precision, conf_matrix, report # return average precision and precision for each class & confusion matrix
 
 
 def evaluate_image(samples_train, query):
@@ -123,12 +118,15 @@ if __name__ == "__main__":
     # evaluate model on dataset
     print("=== Model evaluation ===")
     print("Validation dataset in progress...")
-    samples_validation = fusion.make_samples(db_validation)
-    ap, precision_classes = evaluate_dataset(samples_train, samples_validation)
+    samples_validation = fusion.make_samples(db_validation, cache=False)
+    accuracy, _, _, conf_matrix, report = evaluate_dataset(samples_train, samples_validation, db_validation.classes)
 
-    # show precision results to user
-    print("* Precision results :")
-    for cls in precision_classes.keys():
-        print("    - %s: %f" % (cls, precision_classes[cls]))
-    
-    print("\n* Classification average precision (AP): %f" % ap) # sample_analysis
+    # show model metrics
+    print(report)
+    print("Model accuracy: %f" % accuracy)
+
+    # render confusion matrix
+    dataframe = pd.DataFrame(conf_matrix, index=[i for i in db_validation.classes], columns=[i for i in db_validation.classes])
+    plt.figure(figsize=(8, 8))
+    sn.heatmap(dataframe, annot=True, fmt='d')
+    plt.show()

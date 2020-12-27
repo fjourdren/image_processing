@@ -142,13 +142,15 @@ class Color(object):
     return samples
   
   
-  def make_samples(self, db, verbose=True):
+  def make_samples(self, db, verbose=True, cache=True):
     if h_type == 'global':
       sample_cache = "histogram_cache-{}-n_bin{}".format(h_type, n_bin)
     elif h_type == 'region':
       sample_cache = "histogram_cache-{}-n_bin{}-n_slice{}".format(h_type, n_bin, n_slice)
     
     try:
+      if cache == False:
+        raise ValueError('Don\'t use cache') 
       samples = cPickle.load(open(os.path.join(cache_dir, sample_cache), "rb", True))
       if verbose:
         print("Using cache..., config=%s, distance=%s, depth=%s" % (sample_cache, d_type, depth))
@@ -165,7 +167,8 @@ class Color(object):
                         'cls':  d_cls, 
                         'hist': d_hist
                       })
-      cPickle.dump(samples, open(os.path.join(cache_dir, sample_cache), "wb", True))
+      if cache:
+        cPickle.dump(samples, open(os.path.join(cache_dir, sample_cache), "wb", True))
   
     return samples
 

@@ -119,10 +119,12 @@ class ResidualNet(ResNet):
 
 class ResNetFeat(object):
 
-  def make_samples(self, db, verbose=True):
+  def make_samples(self, db, verbose=True, cache=True):
     sample_cache = '{}-{}'.format(RES_model, pick_layer)
   
     try:
+      if cache == False:
+        raise ValueError('Don\'t use cache') 
       samples = cPickle.load(open(os.path.join(cache_dir, sample_cache), "rb", True))
       for sample in samples:
         sample['hist'] /= np.sum(sample['hist'])  # normalize
@@ -162,7 +164,9 @@ class ResNetFeat(object):
                          })
         except:
           pass
-      cPickle.dump(samples, open(os.path.join(cache_dir, sample_cache), "wb", True))
+
+      if cache:
+        cPickle.dump(samples, open(os.path.join(cache_dir, sample_cache), "wb", True))
   
     return samples
 
