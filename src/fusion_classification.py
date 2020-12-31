@@ -22,7 +22,7 @@ from evaluate import (
 
 # variable
 d_type = 'd1' # d1 is the method to calculate distances
-depth  = 5 # 5 closest neighbors
+depth  = 4 # 4 closest neighbors
 
 
 def evaluate_dataset(samples_train, samples_validation, classes):
