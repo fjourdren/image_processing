@@ -1,10 +1,8 @@
 import numpy as np
 import time
-import matplotlib.pyplot as plt
-import seaborn as sn
-import pandas as pd
+import os
 from sklearn.utils.extmath import weighted_mode
-from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, classification_report
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score, classification_report
 
 from fusion import FeatureFusion
 
@@ -14,6 +12,7 @@ from edge import Edge
 from HOG import HOG
 
 from DB import Database, DatabaseType
+from plot_utils import render_confusion_matrix
 from evaluate import (
     infer,
     AP
@@ -56,13 +55,16 @@ def evaluate_dataset(samples_train, samples_validation, classes):
     # calculate precision
     precision = precision_score(y_true, y_pred, average=None)
 
+    # calculate F1 score
+    f1 = f1_score(y_true, y_pred, average=None)
+
     # calculate confusion matrix
     conf_matrix = confusion_matrix(y_true, y_pred, labels=list(classes))
 
     # make report
     report = classification_report(y_true, y_pred, target_names=list(classes))
 
-    return accuracy, recall, precision, conf_matrix, report # return average precision and precision for each class & confusion matrix
+    return accuracy, recall, precision, f1, conf_matrix, report # return average precision and precision for each class & confusion matrix
 
 
 def evaluate_image(samples_train, query):
@@ -86,9 +88,9 @@ if __name__ == "__main__":
     # pick datasets
     print("=== Preparing datasets ===")
     print("Preparing dataset objects.")
-    db_train = Database(DatabaseType.TRAIN)
+    db_train      = Database(DatabaseType.TRAIN)
     db_validation = Database(DatabaseType.VALIDATION)
-    db_test = Database(DatabaseType.TEST)
+    db_test       = Database(DatabaseType.TEST)
 
 
 
@@ -99,34 +101,48 @@ if __name__ == "__main__":
     fusion = FeatureFusion(features=['color', 'daisy'])
     samples_train = fusion.make_samples(db_train)
     train_time = round((time.time() - start_time) / 60, 3) # get train time in minute
-    print("Trained in %smins." % (train_time))
+    print("Trained in %smin." % (train_time))
 
 
 
-    # predict one image
-    print("=== Predict one image ===")
-    filename = "database\\test\\obj_car\\29031.jpg"
-    expected_cls = "obj_car"
+    # predict a random image
+    print("=== Predict a random image ===")
+    start_time = time.time()
+    filename = np.random.choice(db_validation.get_data()['img']) # take a random image to process in the test dataset (high probability of bad classification)
+    expected_cls = filename.split(os.sep)[-2] # get random image class
     print("Performing image: %s" % filename)
     print("Expected class: %s" % expected_cls)
     query = fusion.make_samples_image(filename)[0]
     predicted_class = evaluate_image(samples_train, query)
     print("Predicted class: %s" % predicted_class)
+    execution_time = round((time.time() - start_time) / 60, 3) # get execution time in minute
+    print("Predicted in %smin." % (execution_time))
 
 
 
     # evaluate model on dataset
     print("=== Model evaluation ===")
     print("Validation dataset in progress...")
+    start_time = time.time()
     samples_validation = fusion.make_samples(db_validation, cache=False)
-    accuracy, _, _, conf_matrix, report = evaluate_dataset(samples_train, samples_validation, db_validation.classes)
+    labels = sorted(db_validation.classes) # sort labels to improve the figure rendering
+    accuracy, recall, precision, f1, conf_matrix, report = evaluate_dataset(samples_train, samples_validation, labels)
+    execution_time = round((time.time() - start_time) / 60, 3) # get execution time in minute
+    seconds_per_image = (execution_time/len(db_validation.get_data()['img']))
+    imgs_per_second = 1/seconds_per_image
+    print("Evaluated %d images in %smin (%fs/img or %fimgs/s)." % (len(db_validation.get_data()['img']), execution_time, seconds_per_image, imgs_per_second))
+
 
     # show model metrics
+    print("- Classes metrics:")
     print(report)
-    print("Model accuracy: %f" % accuracy)
 
-    # render confusion matrix
-    dataframe = pd.DataFrame(conf_matrix, index=[i for i in db_validation.classes], columns=[i for i in db_validation.classes])
-    plt.figure(figsize=(8, 8))
-    sn.heatmap(dataframe, annot=True, fmt='d')
-    plt.show()
+    print("- Model metrics:")
+    print("    * Model accuracy:  %f" % accuracy)
+    print("    * Model recall:    %f" % np.mean(recall))
+    print("    * Model precision: %f" % np.mean(precision))
+    print("    * Model f1:        %f" % np.mean(f1))
+
+
+    # render confusion matrix to the user
+    render_confusion_matrix(conf_matrix, labels)

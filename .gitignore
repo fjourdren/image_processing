@@ -4,6 +4,7 @@ database
 model
 result/MMAP_result
 result/*.csv
+result/*.png
 __pycache__
 data*.csv
 nogit_*
