@@ -4,7 +4,7 @@ import pandas as pd
 
 import os
 
-result_path = os.path.join("result")
+result_path = os.path.join("result", "fusion_classification")
 if not os.path.exists(result_path):
     os.makedirs(result_path)
 

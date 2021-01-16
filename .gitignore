@@ -3,6 +3,8 @@ cache
 database
 model
 result/MMAP_result
+result/deeplearning_classification
+result/fusion_classification
 result/*.csv
 result/*.png
 __pycache__

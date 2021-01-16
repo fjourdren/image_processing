@@ -1,6 +1,7 @@
 import numpy as np
 import time
 import os
+import shutil
 from sklearn.utils.extmath import weighted_mode
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score, classification_report
 
@@ -23,6 +24,8 @@ from evaluate import (
 # variable
 d_type = 'd1' # d1 is the method to calculate distances
 depth  = 4 # 4 closest neighbors
+
+path_results = os.path.join("result", "fusion_classification")
 
 
 def evaluate_dataset(samples_train, samples_validation, classes):
@@ -142,6 +145,31 @@ if __name__ == "__main__":
     print("    * Model recall:    %f" % np.mean(recall))
     print("    * Model precision: %f" % np.mean(precision))
     print("    * Model f1:        %f" % np.mean(f1))
+
+
+
+    # predict on all images and move in result folder
+    print("=== File saving evaluation ===")
+    print("Performing evaluation with file copy in result directory...")
+    # create result dir
+    if not os.path.exists(path_results):
+        os.makedirs(path_results)    
+    
+    # create class result dirs
+    for cls in labels:
+        path_cls = os.path.join(path_results, cls)
+        if not os.path.exists(path_cls):
+            os.makedirs(path_cls)
+
+    # make a classification for each file in test dataset
+    for filename in db_validation.get_data()['img']:
+        query = fusion.make_samples_image(filename)[0]
+        predicted_class = evaluate_image(samples_train, query)
+
+        # copy file after classification
+        shutil.copy(filename, os.path.join(path_results, predicted_class, os.path.basename(filename)))
+
+    print("You can look images in details in ", path_results)
 
 
     # render confusion matrix to the user
