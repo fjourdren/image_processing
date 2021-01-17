@@ -1,14 +1,23 @@
 [![Open Source Love](https://badges.frapsoft.com/os/v1/open-source-150x25.png?v=103)](https://github.com/ellerbrock/open-source-badges/)
 
-## Intro 
+# Project
+## Intro
+__This project is a fork from: [pochih/CBIR](https://github.com/pochih/CBIR)__
+
 __This repository contains a CBIR (content-based image retrieval) system__
 
-__Extract query image's feature, and retrieve similar ones from image database__
+__Extract query image's feature, and retrieve similar ones from image database or make a classification__
 
 <img align='center' style="border-color:gray;border-width:2px;border-style:dashed"   src='https://github.com/pochih/CBIR/blob/img/CBIR.png' padding='5px' height="300px"></img>
 <h6><a href='https://winstonhsu.info/2017f-mmai/'>Image src</a></h6>
 
 
+## Install requirements
+```
+pip install --upgrade --user -r requirements.txt
+```
+
+# Find similar images
 ## Part1: Feature Extraction
 
 In this system, I implement several popular image features:
@@ -112,6 +121,16 @@ Please refer to [USAGE.md](https://github.com/pochih/CBIR/blob/master/USAGE.md)
 The details are written inside.
 
 
+# Classification
+## Prepare data
+```
+python src/split_dataset.py
+```
+## Usage
+```
+python src/fusion_classification.py
+```
 
 ## Author
-Po-Chih Huang / [@pochih](http://pochih.github.io/)
+- Po-Chih Huang / [@pochih](http://pochih.github.io/)
+- Flavien Jourdren / [@fjourdren](https://github.com/fjourdren)
