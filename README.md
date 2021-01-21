@@ -2,7 +2,7 @@
 
 # Project
 ## Intro
-__This project is a fork from: [pochih/CBIR](https://github.com/pochih/CBIR)__
+__This project is a fork of: [pochih/CBIR](https://github.com/pochih/CBIR)__
 
 __This repository contains a CBIR (content-based image retrieval) system__
 
